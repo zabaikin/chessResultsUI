@@ -28,7 +28,12 @@
       "storage"
     ],
     "host_permissions": [
-      "https://*/*"
+      "https://chess-results.com/*",
+      "http://chess-results.com/*",
+      "https://*.chess-results.com/*",
+      "http://*.chess-results.com/*",
+      "https://fonts.googleapis.com/*",
+      "https://fonts.gstatic.com/*"
     ]
   }
 }

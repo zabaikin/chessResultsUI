@@ -1,7 +1,7 @@
 # Project: Browser Extension for Legacy Site UI Improvement
 
 ## Project Goal
-Build a browser extension that improves the UI/UX of a legacy website.
+Build a browser extension that improves the UI/UX of a legacy website chess-results.com.
 Monetization: optional BuyMeACoffee support model.
 
 ---
