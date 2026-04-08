@@ -1,4 +1,8 @@
-import type { PlasmoCSConfig } from "plasmo"
+import type { PlasmoCSConfig } from "plasmo";
+
+
+
+
 
 export const config: PlasmoCSConfig = {
   matches: [
@@ -23,11 +27,6 @@ const style = document.createElement("style")
 style.textContent = `
   * {
     font-family: 'Roboto', sans-serif !important;
-  }
-
-  /* Cell padding */
-  table td, table th {
-    padding: 5px 8px !important;
   }
 
   /* Zebra striping */
@@ -71,6 +70,47 @@ style.textContent = `
   }
 `
 document.head.appendChild(style)
+
+// ── Ad removal ───────────────────────────────────────────────────────────────
+const AD_SELECTORS = [
+  "ins.adsbygoogle",
+  'div[id^="div-gpt-ad"]',
+  'iframe[src*="googlesyndication"]',
+  'iframe[src*="doubleclick"]',
+  'div[id*="banner"]',
+  'div[class*="banner"]',
+  'div[id*="F8"]',
+  "div.fedAdv"
+].join(", ")
+
+function removeAds(root: Document | Element = document) {
+  root.querySelectorAll(AD_SELECTORS).forEach((el) => el.remove())
+}
+
+// Remove ads already in the DOM
+removeAds()
+
+// Watch for dynamically injected ads
+const observer = new MutationObserver((mutations) => {
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes) {
+      if (node instanceof Element) {
+        if (node.matches(AD_SELECTORS)) {
+          node.remove()
+        } else {
+          removeAds(node)
+        }
+      }
+    }
+  }
+})
+
+observer.observe(document.body, { childList: true, subtree: true })
+
+// ── DOM cleanup ───────────────────────────────────────────────────────────────
+document
+  .querySelector("#datenxx tr:last-child td:last-child")
+  ?.remove()
 
 // ── Theme logic ───────────────────────────────────────────────────────────────
 function applyTheme(dark: boolean) {
