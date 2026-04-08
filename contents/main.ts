@@ -28,6 +28,25 @@ style.textContent = `
   * {
     font-family: 'Roboto', sans-serif !important;
   }
+  
+  body {
+    font-size: 12pt;
+  }
+
+  /* Menu links */
+  ul.navlist a:link,
+  ul.navlist a:visited {
+    color: #ffffff !important;
+  }
+
+  /* Links – light mode */
+  a:link {
+    color: #1a73e8 !important;
+  }
+
+  a:visited {
+    color: #7b1fa2 !important;
+  }
 
   /* Zebra striping */
   table tr:nth-child(even) {
@@ -48,6 +67,10 @@ style.textContent = `
   html.chess-ui-dark a {
     color: #8b83ff !important;
   }
+  
+  html.chess-ui-dark a:visited {
+    color: #7b1fa2 !important;
+  }
 
   html.chess-ui-dark table {
     border-color: #2a2a3a !important;
@@ -67,6 +90,10 @@ style.textContent = `
     background-color: #1c1c28 !important;
     color: #eaeaef !important;
     border-color: #2a2a3a !important;
+  }
+  
+  div.defaultDialog, div.defaultDialogKleiner, div.defaultDialogMsg, div.defaultDialogIFrame {
+    padding: 5px;  
   }
 `
 document.head.appendChild(style)
