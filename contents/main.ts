@@ -48,6 +48,16 @@ style.textContent = `
     color: #7b1fa2 !important;
   }
 
+  /* Full width layout */
+  .daten {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .daten table {
+    width: 100% !important;
+  }
+
   /* Zebra striping */
   table tr:nth-child(even) {
     background-color: #f5f7fa !important;
@@ -133,6 +143,19 @@ const observer = new MutationObserver((mutations) => {
 })
 
 observer.observe(document.body, { childList: true, subtree: true })
+
+// ── Full width: strip inline widths ──────────────────────────────────────────
+function stripWidths(root: Document | Element = document) {
+  root.querySelectorAll("table, td, th, tr, div").forEach((el) => {
+    const htmlEl = el as HTMLElement
+    htmlEl.removeAttribute("width")
+    htmlEl.style.removeProperty("width")
+    htmlEl.style.removeProperty("max-width")
+    htmlEl.style.removeProperty("min-width")
+  })
+}
+
+stripWidths()
 
 // ── DOM cleanup ───────────────────────────────────────────────────────────────
 document
