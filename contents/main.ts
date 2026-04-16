@@ -49,13 +49,53 @@ style.textContent = `
   }
 
   /* Full width layout */
+  body {
+    max-width: 100% !important;
+    overflow-x: hidden;
+  }
+
   .daten {
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box;
   }
 
-  .daten table {
+  .daten table,
+  table {
     width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  td, th {
+    word-break: break-word;
+  }
+
+  /* Responsive width classes (applied by JS based on original px value) */
+  .cr-w-medium {
+    width: 48% !important;
+    max-width: 48% !important;
+    box-sizing: border-box;
+    margin: 5px auto;
+  }
+
+  @media (max-width: 1250px) {
+    .cr-w-medium {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+
+  .cr-w-full {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* Responsive images */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
   }
 
   /* Zebra striping */
@@ -105,6 +145,10 @@ style.textContent = `
   div.defaultDialog, div.defaultDialogKleiner, div.defaultDialogMsg, div.defaultDialogIFrame {
     padding: 5px;  
   }
+
+  #fuss {
+  display: none;
+  }
 `
 document.head.appendChild(style)
 
@@ -124,10 +168,62 @@ function removeAds(root: Document | Element = document) {
   root.querySelectorAll(AD_SELECTORS).forEach((el) => el.remove())
 }
 
-// Remove ads already in the DOM
-removeAds()
+// ── Full width: strip inline widths ──────────────────────────────────────────
+const WIDTH_SELECTORS = "table, td, th, tr, div, span, col, colgroup, form, section, article, header, footer, main, aside, nav, figure, img"
 
-// Watch for dynamically injected ads
+function applyResponsiveWidth(htmlEl: HTMLElement, px: number) {
+  if (px < 100) {
+    // Small fixed widths — leave untouched
+    return
+  } else if (px <= 500) {
+    htmlEl.classList.add("cr-w-medium")
+  } else if (px >= 800) {
+    htmlEl.classList.add("cr-w-full")
+  }
+  // 501–799px — leave untouched
+}
+
+function stripWidths(root: Document | Element = document) {
+  root.querySelectorAll(WIDTH_SELECTORS).forEach((el) => {
+    // Keep div.fed — it's the flag column and needs its 37px
+    if (el.matches("div.fed")) return
+    const htmlEl = el as HTMLElement
+
+    // Check inline style width
+    const styleWidth = htmlEl.style.width
+    if (styleWidth && styleWidth.includes("px")) {
+      const px = parseFloat(styleWidth)
+      if (!isNaN(px)) {
+        htmlEl.style.removeProperty("width")
+        htmlEl.style.removeProperty("max-width")
+        htmlEl.style.removeProperty("min-width")
+        applyResponsiveWidth(htmlEl, px)
+        return
+      }
+    }
+
+    // Check width= attribute (skip percentage values like width="100%")
+    const attrWidth = htmlEl.getAttribute("width")
+    if (attrWidth && !attrWidth.includes("%")) {
+      const px = parseFloat(attrWidth)
+      if (!isNaN(px)) {
+        htmlEl.removeAttribute("width")
+        htmlEl.style.removeProperty("max-width")
+        htmlEl.style.removeProperty("min-width")
+        applyResponsiveWidth(htmlEl, px)
+        return
+      }
+    }
+  })
+}
+
+// ── Hide empty elements ───────────────────────────────────────────────────────
+const EMPTY_SELECTORS = "table, div, span, p, section, aside, article, header, footer, nav"
+// Remove ads, strip widths, and hide empty elements already in the DOM
+removeAds()
+stripWidths()
+
+// Watch for dynamically injected content
 const observer = new MutationObserver((mutations) => {
   for (const mutation of mutations) {
     for (const node of mutation.addedNodes) {
@@ -136,6 +232,7 @@ const observer = new MutationObserver((mutations) => {
           node.remove()
         } else {
           removeAds(node)
+          stripWidths(node)
         }
       }
     }
@@ -143,19 +240,6 @@ const observer = new MutationObserver((mutations) => {
 })
 
 observer.observe(document.body, { childList: true, subtree: true })
-
-// ── Full width: strip inline widths ──────────────────────────────────────────
-function stripWidths(root: Document | Element = document) {
-  root.querySelectorAll("table, td, th, tr, div").forEach((el) => {
-    const htmlEl = el as HTMLElement
-    htmlEl.removeAttribute("width")
-    htmlEl.style.removeProperty("width")
-    htmlEl.style.removeProperty("max-width")
-    htmlEl.style.removeProperty("min-width")
-  })
-}
-
-stripWidths()
 
 // ── DOM cleanup ───────────────────────────────────────────────────────────────
 document
