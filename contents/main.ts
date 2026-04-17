@@ -33,10 +33,67 @@ style.textContent = `
     font-size: 12pt;
   }
 
+  /* Nav bars */
+  #menu0, #menu0L, #menu1, #menu2 {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    background-color: #1e1e2e;
+  }
+
+  #menu0 ul.navlist,
+  #menu0L ul.navlist,
+  #menu1 ul.navlist,
+  #menu2 ul.navlist {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 8px;
+    margin: 0;
+    list-style: none;
+  }
+
+  #menu1 ul.navlist,
+  #menu2 ul.navlist {
+    padding: 0 8px;
+  }
+
   /* Menu links */
   ul.navlist a:link,
   ul.navlist a:visited {
     color: #ffffff !important;
+    text-decoration: none !important;
+    padding: 6px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    font-size: 11pt;
+    transition: background-color 0.15s;
+  }
+
+  ul.navlist a.OtherTabs:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  ul.navlist a.SelectedTab {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    font-weight: 500;
+  }
+
+  ul.navlist a.Link {
+    color: #a8b4ff !important;
+  }
+
+  ul.navlist a.Link:hover {
+    background-color: rgba(168, 180, 255, 0.15) !important;
+  }
+
+  /* Dark mode nav */
+  html.chess-ui-dark #menu0,
+  html.chess-ui-dark #menu0L,
+  html.chess-ui-dark #menu1,
+  html.chess-ui-dark #menu2 {
+    background-color: #0e0e1a !important;
   }
 
   /* Links – light mode */
@@ -87,8 +144,8 @@ style.textContent = `
 
   /* Responsive width classes (applied by JS based on original px value) */
   .cr-w-medium {
-    width: 48% !important;
-    max-width: 48% !important;
+    width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box;
     margin: 5px auto;
   }
@@ -159,6 +216,7 @@ style.textContent = `
   div.defaultDialog, div.defaultDialogKleiner, div.defaultDialogMsg, div.defaultDialogIFrame {
     padding: 10px;  
     margin: 5px 10px 5px 0 !important;
+    height: auto !important;
   }
 
   #fuss {
@@ -356,6 +414,10 @@ function buildLanguageSelector() {
 
   // Remove font size link
   document.getElementById("Hyp_Font")?.closest("li")?.remove()
+
+  // Clean up empty <li> items in other nav bars
+  document.querySelectorAll("#menu0 li:empty, #menu1 li:empty, #menu2 li:empty")
+    .forEach((li) => li.remove())
 }
 
 if (document.readyState === "loading") {
