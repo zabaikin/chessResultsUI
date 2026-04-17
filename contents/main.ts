@@ -54,6 +54,20 @@ style.textContent = `
     overflow-x: hidden;
   }
 
+  @media (max-width: 1249px) {
+    body {
+      padding-left: 8px !important;
+      padding-right: 10px !important;
+    }
+  }
+
+  @media (min-width: 1250px) {
+    body {
+      padding-left: 10% !important;
+      padding-right: 10% !important;
+    }
+  }
+
   .daten {
     width: 100% !important;
     max-width: 100% !important;
@@ -143,11 +157,16 @@ style.textContent = `
   }
   
   div.defaultDialog, div.defaultDialogKleiner, div.defaultDialogMsg, div.defaultDialogIFrame {
-    padding: 5px;  
+    padding: 10px;  
+    margin: 5px 10px 5px 0 !important;
   }
 
   #fuss {
-  display: none;
+    display: none;
+  }
+
+  .fed {
+    font-size: 10pt;
   }
 `
 document.head.appendChild(style)
@@ -161,11 +180,15 @@ const AD_SELECTORS = [
   'div[id*="banner"]',
   'div[class*="banner"]',
   'div[id*="F8"]',
-  "div.fedAdv"
+  "div.fedAdv",
+  "#Table3"
 ].join(", ")
 
 function removeAds(root: Document | Element = document) {
-  root.querySelectorAll(AD_SELECTORS).forEach((el) => el.remove())
+  root.querySelectorAll(AD_SELECTORS).forEach((el) => {
+    if (el.matches("div.fed")) return
+    el.remove()
+  })
 }
 
 // ── Full width: strip inline widths ──────────────────────────────────────────
@@ -217,8 +240,6 @@ function stripWidths(root: Document | Element = document) {
   })
 }
 
-// ── Hide empty elements ───────────────────────────────────────────────────────
-const EMPTY_SELECTORS = "table, div, span, p, section, aside, article, header, footer, nav"
 // Remove ads, strip widths, and hide empty elements already in the DOM
 removeAds()
 stripWidths()
@@ -240,11 +261,6 @@ const observer = new MutationObserver((mutations) => {
 })
 
 observer.observe(document.body, { childList: true, subtree: true })
-
-// ── DOM cleanup ───────────────────────────────────────────────────────────────
-document
-  .querySelector("#datenxx tr:last-child td:last-child")
-  ?.remove()
 
 // ── Theme logic ───────────────────────────────────────────────────────────────
 function applyTheme(dark: boolean) {
