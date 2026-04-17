@@ -168,6 +168,36 @@ style.textContent = `
   .fed {
     font-size: 10pt;
   }
+
+  /* ── Language selector ── */
+  #cr-lang-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: 'Roboto', sans-serif;
+    font-size: 11pt;
+    padding: 3px 26px 3px 8px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23ffffff' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 7px center;
+    background-size: 10px;
+    outline: none;
+    vertical-align: middle;
+  }
+
+  #cr-lang-select:hover {
+    border-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  #cr-lang-select option {
+    background-color: #2c2c3a;
+    color: #ffffff;
+  }
 `
 document.head.appendChild(style)
 
@@ -278,3 +308,58 @@ chrome.storage.onChanged.addListener((changes, area) => {
     applyTheme(changes[THEME_KEY].newValue === "dark")
   }
 })
+
+// ── Language selector ─────────────────────────────────────────────────────────
+const LANG_FLAGS: Record<string, string> = {
+  EGY: "🇪🇬", ARM: "🇦🇲", AZE: "🇦🇿", BIH: "🇧🇦", BUL: "🇧🇬",
+  CAT: "🏴", CHN: "🇨🇳", CRO: "🇭🇷", CZE: "🇨🇿", DEN: "🇩🇰",
+  ENG: "🇬🇧", ESP: "🇪🇸", FAI: "🇫🇴", FIN: "🇫🇮", FRA: "🇫🇷",
+  GER: "🇩🇪", GRE: "🇬🇷", INA: "🇮🇩", ITA: "🇮🇹", JPN: "🇯🇵",
+  MKD: "🇲🇰", LTU: "🇱🇹", NED: "🇳🇱", POL: "🇵🇱", POR: "🇵🇹",
+  ROU: "🇷🇴", RUS: "🇷🇺", SRB: "🇷🇸", SVK: "🇸🇰", SWE: "🇸🇪",
+  TUR: "🇹🇷", UKR: "🇺🇦", VIE: "🇻🇳",
+}
+
+function buildLanguageSelector() {
+  const menu = document.getElementById("menu0L")
+  if (!menu) return
+
+  const langItems = Array.from(menu.querySelectorAll("li")).filter((li) => {
+    const a = li.querySelector("a[id^='Hyp_']") as HTMLAnchorElement | null
+    return a && a.href.includes("lan=")
+  })
+  if (langItems.length === 0) return
+
+  const select = document.createElement("select")
+  select.id = "cr-lang-select"
+
+  langItems.forEach((li) => {
+    const a = li.querySelector("a") as HTMLAnchorElement
+    const code = a.id.replace("Hyp_", "")
+    const flag = LANG_FLAGS[code] ?? "🌐"
+    const option = document.createElement("option")
+    option.value = a.href
+    option.textContent = `${flag} ${a.textContent?.trim()}`
+    if (a.classList.contains("SelectedTab")) option.selected = true
+    select.appendChild(option)
+  })
+
+  select.addEventListener("change", () => {
+    window.location.href = select.value
+  })
+
+  const wrapperLi = document.createElement("li")
+  wrapperLi.appendChild(select)
+  langItems[0].parentNode?.insertBefore(wrapperLi, langItems[0])
+  langItems.forEach((li) => li.remove())
+  menu.querySelectorAll("li:empty").forEach((li) => li.remove())
+
+  // Remove font size link
+  document.getElementById("Hyp_Font")?.closest("li")?.remove()
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", buildLanguageSelector)
+} else {
+  buildLanguageSelector()
+}
